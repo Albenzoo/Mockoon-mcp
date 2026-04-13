@@ -3,12 +3,16 @@ import { z } from "zod";
 import { DataBucket } from "@mockoon/commons";
 import {
   getDefaultMockoonDir,
+  getExtraDataDirs,
   readEnvironment,
   writeEnvironment,
   findEnvironmentFile,
 } from "../mockoon/fileManager.js";
 
-const STORAGE_DIR = process.env.MOCKOON_STORAGE_DIR ?? getDefaultMockoonDir();
+const STORAGE_DIRS = [
+  process.env.MOCKOON_STORAGE_DIR ?? getDefaultMockoonDir(),
+  ...getExtraDataDirs(),
+];
 
 export function registerTemplateTools(server: McpServer): void {
   // List all databuckets in an environment
@@ -19,7 +23,7 @@ export function registerTemplateTools(server: McpServer): void {
       inputSchema: { environmentId: z.string().uuid().describe("Environment UUID") },
     },
     async ({ environmentId }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }
@@ -46,7 +50,7 @@ export function registerTemplateTools(server: McpServer): void {
       },
     },
     async ({ environmentId, name, value }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }
@@ -83,7 +87,7 @@ export function registerTemplateTools(server: McpServer): void {
       },
     },
     async ({ environmentId, templateId, value }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }
@@ -111,7 +115,7 @@ export function registerTemplateTools(server: McpServer): void {
       },
     },
     async ({ environmentId, templateId }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }

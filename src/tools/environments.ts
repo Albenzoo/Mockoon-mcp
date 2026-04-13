@@ -4,25 +4,40 @@ import { Environment } from "@mockoon/commons";
 import path from "path";
 import {
   getDefaultMockoonDir,
+  getExtraDataDirs,
   listEnvironments,
-  readEnvironment,
   writeEnvironment,
   findEnvironmentFile,
 } from "../mockoon/fileManager.js";
 
-const STORAGE_DIR = process.env.MOCKOON_STORAGE_DIR ?? getDefaultMockoonDir();
+const STORAGE_DIRS = [
+  process.env.MOCKOON_STORAGE_DIR ?? getDefaultMockoonDir(),
+  ...getExtraDataDirs(),
+];
 
 export function registerEnvironmentTools(server: McpServer): void {
   // List all available environments
   server.registerTool(
     "list_environments",
-    { description: "List all available Mockoon environments" },
+    {
+      description:
+        "List all local Mockoon environment files. Returns the file path for each environment, which can be passed to start_mock. Searches the default storage directory and any extra directories set via MOCKOON_DATA_DIRS.",
+    },
     async () => {
-      const envs = listEnvironments(STORAGE_DIR);
+      const envs = listEnvironments(STORAGE_DIRS);
       if (envs.length === 0) {
-        return { content: [{ type: "text", text: "No environments found in: " + STORAGE_DIR }] };
+        return {
+          content: [
+            {
+              type: "text",
+              text: `No environments found. Searched directories: ${STORAGE_DIRS.join(", ")}`,
+            },
+          ],
+        };
       }
-      const list = envs.map((e) => `- [${e.id}] ${e.name} (port: ${e.port})`).join("\n");
+      const list = envs
+        .map((e) => `- [${e.id}] ${e.name} (port: ${e.port}, file: ${e.filePath})`)
+        .join("\n");
       return { content: [{ type: "text", text: list }] };
     }
   );
@@ -62,7 +77,7 @@ export function registerEnvironmentTools(server: McpServer): void {
         callbacks: [],
       };
 
-      const filePath = path.join(STORAGE_DIR, `${uuid}.json`);
+      const filePath = path.join(STORAGE_DIRS[0], `${uuid}.json`);
       writeEnvironment(filePath, env);
 
       return {
@@ -75,11 +90,11 @@ export function registerEnvironmentTools(server: McpServer): void {
   server.registerTool(
     "delete_environment",
     {
-      description: "Delete a Mockoon environment by UUID",
+      description: "Delete a Mockoon environment by UUID. The environment file will be permanently removed from disk.",
       inputSchema: { environmentId: z.string().uuid().describe("UUID of the environment to delete") },
     },
     async ({ environmentId }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }

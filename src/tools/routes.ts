@@ -3,12 +3,16 @@ import { z } from "zod";
 import { Route, RouteType, Methods, BodyTypes, StreamingMode } from "@mockoon/commons";
 import {
   getDefaultMockoonDir,
+  getExtraDataDirs,
   readEnvironment,
   writeEnvironment,
   findEnvironmentFile,
 } from "../mockoon/fileManager.js";
 
-const STORAGE_DIR = process.env.MOCKOON_STORAGE_DIR ?? getDefaultMockoonDir();
+const STORAGE_DIRS = [
+  process.env.MOCKOON_STORAGE_DIR ?? getDefaultMockoonDir(),
+  ...getExtraDataDirs(),
+];
 
 export function registerRouteTools(server: McpServer): void {
   // List all routes in an environment
@@ -19,7 +23,7 @@ export function registerRouteTools(server: McpServer): void {
       inputSchema: { environmentId: z.string().uuid().describe("Environment UUID") },
     },
     async ({ environmentId }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }
@@ -58,7 +62,7 @@ export function registerRouteTools(server: McpServer): void {
       },
     },
     async ({ environmentId, method, endpoint, statusCode, body, label, contentType, headers }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }
@@ -129,7 +133,7 @@ export function registerRouteTools(server: McpServer): void {
       },
     },
     async ({ environmentId, routeId }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }
@@ -163,7 +167,7 @@ export function registerRouteTools(server: McpServer): void {
       },
     },
     async ({ environmentId, routeId, body, statusCode }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }
@@ -203,7 +207,7 @@ export function registerRouteTools(server: McpServer): void {
       },
     },
     async ({ environmentId, routeId, headers }) => {
-      const filePath = findEnvironmentFile(STORAGE_DIR, environmentId);
+      const filePath = findEnvironmentFile(STORAGE_DIRS, environmentId);
       if (!filePath) {
         return { content: [{ type: "text", text: `Environment '${environmentId}' not found.` }], isError: true };
       }

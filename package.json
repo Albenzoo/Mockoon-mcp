@@ -1,14 +1,19 @@
 {
-  "name": "mockoon-mcp-server",
+  "name": "mockoon-mcp",
   "version": "0.1.0",
   "description": "MCP Server for Mockoon - create and manage mock APIs via LLMs",
   "type": "module",
   "main": "dist/index.js",
+  "files": ["dist"],
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts"
+  },
+  "bin": {
+    "mockoon-mcp": "dist/index.js"
   },
   "dependencies": {
     "@mockoon/commons": "^9.5.0",
