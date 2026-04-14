@@ -33,7 +33,9 @@ src/index.ts                  ← entry point: creates McpServer, registers serv
                                 (start_server, stop_server, list_running_servers),
                                 imports and calls all registerXxxTools(), connects StdioServerTransport
 src/tools/environments.ts     ← tools: list_environments, create_environment, delete_environment
-src/tools/routes.ts           ← tools: list_routes, create_route, update_route_body, delete_route
+src/tools/routes.ts           ← tools: list_routes, get_route, create_route, create_route_with_responses,
+                                        bulk_create_routes, update_route, duplicate_route, delete_route,
+                                        add_route_response, set_default_response, get_default_response
 src/tools/templates.ts        ← tools: list_templates, create_template, update_template, delete_template
 src/mockoon/fileManager.ts    ← reads/writes Mockoon JSON files on disk
 src/mockoon/processManager.ts ← starts/stops mockoon-cli processes (in-memory Map<environmentId, ChildProcess>)
@@ -83,6 +85,34 @@ env.rootChildren.push({ type: "route", uuid: routeUuid });
 ```
 
 Similarly, when deleting a route, remove it from both arrays.
+
+### Shared response schema (`responseSchema`)
+`src/tools/routes.ts` defines a module-level `responseSchema` (Zod object) and a `buildResponse()` helper used by `create_route`, `create_route_with_responses`, `bulk_create_routes` and `add_route_response`. When adding new route tools that construct responses, reuse these helpers instead of duplicating the response shape.
+
+Key fields in `responseSchema`:
+- `statusCode`, `body`, `label`, `contentType`, `headers[]`
+- `rules[]` — each rule has `target`, `modifier`, `value`, `invert`, `operator`
+- `rulesOperator` — `"AND"` | `"OR"`
+- `isDefault` — if `true`, all other responses in the route are demoted
+
+`buildRoute()` helper assembles a valid `Route` object from method, endpoint, documentation and a responses array.
+
+### Route tools overview
+| Tool | Description |
+|---|---|
+| `list_routes` | Lists all routes with UUID, method, endpoint, response count |
+| `get_route` | Full detail of one route: all responses with rules, headers, body |
+| `create_route` | Creates a route with a single default response |
+| `create_route_with_responses` | Creates a route + N responses in one call |
+| `bulk_create_routes` | Creates N routes in one call (scaffolding) |
+| `update_route` | Updates method/endpoint/documentation and/or default response fields |
+| `duplicate_route` | Clones a route with new UUIDs, appends "(copy)" to documentation |
+| `delete_route` | Deletes a route and removes it from `rootChildren` |
+| `add_route_response` | Adds a conditional/alternative response to an existing route |
+| `set_default_response` | Changes which response is marked `default: true` |
+| `get_default_response` | Returns the current default response (quick inspect) |
+
+> `update_route_body` and `update_route_headers` have been removed — use `update_route` instead.
 
 ### Route shape (`@mockoon/commons` v9)
 Required fields when constructing a `Route` object:

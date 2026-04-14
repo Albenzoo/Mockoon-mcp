@@ -71,7 +71,7 @@ export function registerEnvironmentTools(server: McpServer): void {
         callbacks: [],
       };
 
-      const filePath = path.join(STORAGE_DIRS[0], `${uuid}.json`);
+      const filePath = path.join(STORAGE_DIRS[0], `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${uuid}.json`);
       writeEnvironment(filePath, env);
 
       return {
