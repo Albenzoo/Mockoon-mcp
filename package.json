@@ -1,7 +1,28 @@
 {
   "name": "mockoon-mcp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "MCP Server for Mockoon - create and manage mock APIs via LLMs",
+  "keywords": [
+    "mcp",
+    "mockoon",
+    "mock-api",
+    "llm",
+    "ai",
+    "model-context-protocol",
+    "copilot",
+    "claude",
+    "cursor"
+  ],
+  "author": "Albenzoo",
+  "license": "MIT",
+  "homepage": "https://github.com/Albenzoo/Mockoon-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Albenzoo/Mockoon-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Albenzoo/Mockoon-mcp/issues"
+  },
   "type": "module",
   "main": "dist/index.js",
   "files": [

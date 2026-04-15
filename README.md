@@ -1,4 +1,6 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/mockoon-mcp)](https://www.npmjs.com/package/mockoon-mcp)
+[![npm downloads](https://img.shields.io/npm/dw/mockoon-mcp)](https://www.npmjs.com/package/mockoon-mcp)
 
 # mockoon-mcp
 
@@ -9,7 +11,8 @@ An MCP server that lets AI assistants (Claude, GitHub Copilot, Cursor, etc.) cre
 ## Requirements
 
 - [Node.js](https://nodejs.org/) 18+
-- [Mockoon Desktop or Mockoon CLI](https://mockoon.com/download/)
+- [Mockoon Desktop](https://mockoon.com/download/) — for managing environment files via the UI
+- [Mockoon CLI](https://mockoon.com/cli/) *(optional)* — required only if you want to use the `start_server` / `stop_server` tools to start mock servers programmatically (`npm install -g @mockoon/cli`)
 
 ---
 
@@ -127,6 +130,8 @@ Example:
 | `start_server`         | Start a mock server for an environment  |
 | `stop_server`          | Stop a running mock server              |
 | `list_running_servers` | List all currently running mock servers |
+
+> **Note:** `start_server` and `stop_server` require [Mockoon CLI](https://mockoon.com/cli/) to be installed globally (`npm install -g @mockoon/cli`). If you only use Mockoon Desktop, these tools will not work — but all other tools (environments, routes, databuckets) work without CLI.
 
 ---
 

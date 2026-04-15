@@ -11,7 +11,7 @@ import { STORAGE_DIRS } from "./utils/helpers.js";
 
 const server = new McpServer({
   name: "mockoon-mcp",
-  version: "1.0.1",
+  version: "1.0.2",
 });
 
 // Register tool groups
